@@ -2,8 +2,6 @@ package suggest
 
 import (
 	"sync"
-
-	"bitbucket.org/yichen/autocomplete/index"
 )
 
 //Used for the bloom filter
@@ -24,8 +22,8 @@ type Suggest struct {
 	//maxDocId is to keep track of the last docId so each
 	//new doc will have a unique id
 	nextID int
-	iIndex *index.InvertedIndex
-	fIndex *index.ForwardIndex
+	iIndex *InvertedIndex
+	fIndex *ForwardIndex
 
 	sync.Mutex
 }
@@ -33,8 +31,8 @@ type Suggest struct {
 func NewSuggest() *Suggest {
 	suggest := &Suggest{
 		nextID: 0,
-		iIndex: index.NewInvertedIndex(),
-		fIndex: index.NewForwardIndex(),
+		iIndex: NewInvertedIndex(),
+		fIndex: NewForwardIndex(),
 	}
 
 	return suggest

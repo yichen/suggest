@@ -2,8 +2,6 @@ package suggest
 
 import (
 	"sort"
-
-	"bitbucket.org/yichen/autocomplete/index"
 )
 
 type RankedResult struct {
@@ -28,7 +26,7 @@ func (r RankedResult) Less(i, j int) bool {
 
 func Score(query, candidate string) float64 {
 	lev := LevenshteinDistance(query, candidate)
-	length := index.Max(len(candidate), len(query))
+	length := Max(len(candidate), len(query))
 	return float64(length-lev) / float64(length+lev) //Jacard score
 }
 
@@ -65,7 +63,7 @@ func LevenshteinDistance(s, t string) int {
 			if s[i] == t[j] {
 				d[i*width+j] = d[(i-1)*width+(j-1)]
 			} else {
-				d[i*width+j] = index.Min(d[(i-1)*width+j]+1, //deletion
+				d[i*width+j] = Min(d[(i-1)*width+j]+1, //deletion
 					d[i*width+(j-1)]+1,     //insertion
 					d[(i-1)*width+(j-1)]+1) //substitution
 			}
