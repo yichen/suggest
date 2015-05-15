@@ -121,14 +121,5 @@ func computeBloomFilter(s string) int {
 //the bit in the comparison's filter.  If the bit is not
 // also 1, you do not have a match.
 func TestBytesFromQuery(bf int, qBloom int) bool {
-
 	return (bf & qBloom) != 0
-
-	// for i := uint(0); i < 64; i++ {
-	// 	//a & (1 << idx) == b & (1 << idx)
-	// 	if (bf&(1<<i) != (1 << i)) && qBloom&(1<<i) == (1<<i) {
-	// 		return false
-	// 	}
-	// }
-	// return true
 }
