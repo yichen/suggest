@@ -54,3 +54,17 @@ func TestRankedResult(t *testing.T) {
 	}
 
 }
+
+func TestSanitizeSymbol(t *testing.T) {
+	symbol := "__consumer_offsets"
+	sanitized := sanitizeSymbol(symbol)
+	if sanitized != "consumer offsets" {
+		t.Error("FAIL santizeSymbols. Expected 'consumer offsets', Actual: " + sanitized)
+	}
+
+	symbol = "__samza_checkpoint_samza-hello-world-i001"
+	sanitized = sanitizeSymbol(symbol)
+	if sanitized != "samza checkpoint samza hello world i001" {
+		t.Error("Failed")
+	}
+}

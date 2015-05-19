@@ -1,6 +1,7 @@
 package suggest
 
 import (
+	"strings"
 	"sync"
 )
 
@@ -120,4 +121,18 @@ func computeBloomFilter(s string) int {
 // also 1, you do not have a match.
 func TestBytesFromQuery(bf int, qBloom int) bool {
 	return (bf & qBloom) != 0
+}
+
+func sanitizeSymbol(symbol string) string {
+	sanitized := ""
+
+	for _, runeValue := range symbol {
+		if runeValue >= 'a' && runeValue <= 'z' || runeValue >= 'A' && runeValue <= 'Z' || runeValue >= '0' && runeValue <= '9' {
+			sanitized += string(runeValue)
+		} else {
+			sanitized += " "
+		}
+	}
+
+	return strings.Trim(sanitized, " ")
 }
