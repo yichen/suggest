@@ -50,6 +50,20 @@ func (s *Suggest) AddDocument(doc string) {
 	s.nextID++
 }
 
+func (s *Suggest) AddSymbol(symbol string) {
+	s.Lock()
+	defer s.Unlock()
+
+	doc := tokenizeSymbol(symbol)
+	filter := computeBloomFilter(doc)
+	s.iIndex.AddDoc(s.nextID, doc, filter)
+
+	// the forward index will retrieve the original symbol
+	// instead of the tokenized doc
+	s.fIndex.AddDoc(s.nextID, symbol)
+	s.nextID++
+}
+
 func (s *Suggest) Search(query string) []string {
 
 	// first search the inverted index for some candidate
@@ -123,16 +137,26 @@ func TestBytesFromQuery(bf int, qBloom int) bool {
 	return (bf & qBloom) != 0
 }
 
-func sanitizeSymbol(symbol string) string {
+func tokenizeSymbol(symbol string) string {
 	sanitized := ""
+
+	isLowerCase := true
 
 	for _, runeValue := range symbol {
 		if runeValue >= 'a' && runeValue <= 'z' || runeValue >= 'A' && runeValue <= 'Z' || runeValue >= '0' && runeValue <= '9' {
+			if runeValue > 'Z' || runeValue < 'A' {
+				isLowerCase = true
+			}
+			// if transition from lowercase to uppercase, split the word
+			if runeValue >= 'A' && runeValue <= 'Z' && isLowerCase {
+				isLowerCase = false
+				sanitized += " "
+			}
 			sanitized += string(runeValue)
 		} else {
 			sanitized += " "
 		}
 	}
 
-	return strings.Trim(sanitized, " ")
+	return strings.ToLower(strings.Trim(sanitized, " "))
 }
