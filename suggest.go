@@ -26,6 +26,8 @@ type Suggest struct {
 	iIndex *InvertedIndex
 	fIndex *ForwardIndex
 
+	docs map[string]bool
+
 	sync.Mutex
 }
 
@@ -34,6 +36,7 @@ func NewSuggest() *Suggest {
 		nextID: 0,
 		iIndex: NewInvertedIndex(),
 		fIndex: NewForwardIndex(),
+		docs:   make(map[string]bool),
 	}
 
 	return suggest
@@ -47,7 +50,15 @@ func (s *Suggest) AddDocument(doc string) {
 	filter := computeBloomFilter(doc)
 	s.iIndex.AddDoc(s.nextID, doc, filter)
 	s.fIndex.AddDoc(s.nextID, doc)
+	s.docs[doc] = true
 	s.nextID++
+}
+
+func (s *Suggest) ContainsDocument(doc string) bool {
+	if s.docs[doc] == true {
+		return true
+	}
+	return false
 }
 
 func (s *Suggest) AddSymbol(symbol string) {
@@ -61,6 +72,7 @@ func (s *Suggest) AddSymbol(symbol string) {
 	// the forward index will retrieve the original symbol
 	// instead of the tokenized doc
 	s.fIndex.AddDoc(s.nextID, symbol)
+	s.docs[symbol] = true
 	s.nextID++
 }
 
