@@ -102,6 +102,38 @@ func (s *Suggest) Search(query string) []string {
 	return result
 }
 
+func (s *Suggest) SearchAll(query string) []string {
+	resultSet := map[string]int{}
+
+	// search for each word in the query string
+	// and record the number of times in each resultset
+	words := strings.Fields(query)
+	for _, word := range words {
+		result := s.Search(word)
+
+		for _, r := range result {
+			if c, ok := resultSet[r]; ok {
+				resultSet[r] = c + 1
+			} else {
+				resultSet[r] = 1
+			}
+		}
+	}
+
+	// The final result is by finding the intersection
+	// of all the result set
+	finalResultSet := []string{}
+	for doc, count := range resultSet {
+		if count == len(words) {
+			finalResultSet = append(finalResultSet, doc)
+		}
+	}
+
+	SortByRank(query, finalResultSet)
+
+	return finalResultSet
+}
+
 //The bloom filter of a word is 8 bytes in length
 //and has each character added separately. That is,
 // if the word is "software development", we make sure

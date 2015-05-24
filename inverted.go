@@ -27,9 +27,11 @@ func (x *InvertedIndex) Size() int {
 // and for each word, take the prefix up to 4 characters, and
 // generate map from the prefix to a tuple of docID and the bloom.
 // as a result,
+// 		t    --> {docId, bloom}
 // 		te   --> {docId, bloom}
 // 		tec  --> {docId, bloom}
 // 		tech --> {docId, bloom}
+// 		w 	 --> {docId, bloom}
 // 		we   --> {docId, bloom}
 // 		web  --> {docId, bloom}
 // 		webs --> {docId, bloom}
@@ -37,7 +39,7 @@ func (x *InvertedIndex) AddDoc(docId int, doc string, bloom int) {
 	for _, word := range strings.Fields(doc) {
 		word = getPrefix(word)
 
-		for i := 2; i <= len(word); i++ {
+		for i := 1; i <= len(word); i++ {
 			prefix := word[:i]
 			ref, ok := (*x)[prefix]
 			if !ok {
@@ -61,7 +63,7 @@ func (x *InvertedIndex) Search(query string) []Document {
 }
 
 func getPrefix(query string) string {
-	qLen := Min(len(query), 4)
+	qLen := Min(len(query), 8)
 	q := query[0:qLen]
 	return strings.ToLower(q)
 }
